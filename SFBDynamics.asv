@@ -1,0 +1,51 @@
+function xdot = SFBDynamics(primal)
+
+global CONSTANTS
+
+% V = primal.states(1,:);		
+% LONG = primal.states(2,:);	
+% LAT = primal.states(3,:);	
+% vv = primal.states(4,:);		
+% vh = primal.states(5,:);	
+% theta = primal.states(6,:);	
+% phi = primal.states(7,:);	
+
+rEarth = 6.3674447e6;  %(m) radius of earth
+global scale
+r = primal.states(1,:)*scale + rEarth;
+xi = primal.states(2,:)*scale;
+phi = primal.states(3,:);
+gamma = primal.states(4,:);
+v = primal.states(5,:);
+zeta = primal.states(6,:);
+alpha = primal.states(7,:);
+eps = primal.states(8,:);
+
+%======================================================================
+% Equations of Motion:
+%======================================================================
+% D = 0;
+% 
+% L = 5;
+% 
+% Vdot = vv;
+% LONGdot = vh .* cos(phi);
+% LATdot = vh .* sin(phi);
+% vvdot = - CONSTANTS.g + L * cos(theta) - D .* sin(theta);
+% vhdot = -L * sin(theta) - D .* cos(theta);
+% thetadot = primal.controls(1,:);
+% phidot = primal.controls(2,:);
+
+
+L = 100;
+D = 0;
+m = 100;
+
+[rdot,xidot,phidot,gammadot,vdot,zetadot] = RotCoords(r,xi,phi,gamma,v,zeta,L,D,m,alpha,eps);
+
+alphadot = primal.controls(1,:);
+epsdot = primal.controls(2,:);
+%=======================================================================
+% xdot = [Vdot; LONGdot; LATdot; vvdot; vhdot; thetadot; phidot];
+
+xdot = [rdot;xidot;phidot;gammadot;vdot;zetadot; alphadot; epsdot];
