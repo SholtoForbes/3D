@@ -2,53 +2,39 @@ function xdot = SFBDynamics(primal)
 
 global CONSTANTS
 global scale
-
+global Atmosphere
 global Coeff
-% V = primal.states(1,:);		
-% LONG = primal.states(2,:);	
-% LAT = primal.states(3,:);	
-% vv = primal.states(4,:);		
-% vh = primal.states(5,:);	
-% theta = primal.states(6,:);	
-% phi = primal.states(7,:);	
+
+A = 62.77; % reference area (m^2)
 
 rEarth = 6.3674447e6;  %(m) radius of earth
 
 r = primal.states(1,:)/scale.V + rEarth;
-xi = primal.states(2,:);
-phi = primal.states(3,:);
-gamma = primal.states(4,:);
+xi = primal.states(2,:)/scale.LATLONG;
+phi = primal.states(3,:)/scale.LATLONG;
+gamma = primal.states(4,:)/scale.ang;
 v = primal.states(5,:)/scale.v;
-zeta = primal.states(6,:);
+zeta = primal.states(6,:)/scale.ang;
 alpha = primal.states(7,:)/scale.a;
-eps = primal.states(8,:);
+chi = primal.states(8,:)/scale.ang;
 
 %======================================================================
 % Equations of Motion:
 %======================================================================
-% D = 0;
-% 
-% L = 5;
-% 
-% Vdot = vv;
-% LONGdot = vh .* cos(phi);
-% LATdot = vh .* sin(phi);
-% vvdot = - CONSTANTS.g + L * cos(theta) - D .* sin(theta);
-% vhdot = -L * sin(theta) - D .* cos(theta);
-% thetadot = primal.controls(1,:);
-% phidot = primal.controls(2,:);
 
-C_L = interp1(Coeff(:,1),Coeff(:,2),alpha); 
+rad2deg(alpha);
+C_L = interp1(Coeff(:,1),Coeff(:,2),rad2deg(alpha));
+C_D = interp1(Coeff(:,1),Coeff(:,3),rad2deg(alpha));
+rho = interp1(Atmosphere(:,1),Atmosphere(:,4),r - rEarth);
 
-L = 140;
-D = 0;
-m = 100;
+L = 0.5.*C_L.*rho.*v.^2.*A;
+m = 9000;
+D = 0.5.*C_D.*rho.*v.^2.*A;
 
-[rdot,xidot,phidot,gammadot,vdot,zetadot] = RotCoords(r,xi,phi,gamma,v,zeta,L,D,m,alpha,eps);
+[rdot,xidot,phidot,gammadot,vdot,zetadot] = RotCoords(r,xi,phi,gamma,v,zeta,L,D,m,alpha,chi);
 
 alphadot = primal.controls(1,:)/scale.a;
-epsdot = primal.controls(2,:);
+chidot = primal.controls(2,:)/scale.LATLONG;
 %=======================================================================
-% xdot = [Vdot; LONGdot; LATdot; vvdot; vhdot; thetadot; phidot];
 
-xdot = [rdot*scale.V;xidot;phidot;gammadot;vdot*scale.v;zetadot; alphadot*scale.a; epsdot];
+xdot = [rdot*scale.V;xidot*scale.LATLONG;phidot*scale.LATLONG;gammadot*scale.ang;vdot*scale.v;zetadot*scale.ang; alphadot*scale.a; chidot*scale.LATLONG]/scale.t;

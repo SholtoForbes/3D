@@ -11,8 +11,10 @@ phi0 = primal.states(3,1);
 gamma0 = primal.states(4,1);
 v0 = primal.states(5,1);	
 zeta0 = primal.states(6,1);
+zetaf = primal.states(6,end);
+gammaf = primal.states(4,end);
 
-eventConditions = zeros(7,1); 
+eventConditions = zeros(9,1); 
 
 %===========================================================
 eventConditions(1) = V0;
@@ -25,4 +27,7 @@ eventConditions(4) = phi0;
 eventConditions(5) = gamma0;
 eventConditions(6) = v0;
 eventConditions(7) = zeta0;
+eventConditions(8) = zetaf;
+eventConditions(9) = gammaf;
+
 
