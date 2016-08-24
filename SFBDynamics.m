@@ -23,18 +23,24 @@ chi = primal.states(8,:)/scale.ang;
 %======================================================================
 
 rad2deg(alpha);
-C_L = interp1(Coeff(:,1),Coeff(:,2),rad2deg(alpha));
-C_D = interp1(Coeff(:,1),Coeff(:,3),rad2deg(alpha));
+if v > 300
+C_L = interp1(Coeff(:,1),Coeff(:,2),rad2deg(alpha))  + 0.001.*(300./v).^3 ;
+C_D = interp1(Coeff(:,1),Coeff(:,3),rad2deg(alpha))  + 0.001.*(300./v).^3 ;
+else
+C_L =  interp1(Coeff(:,1),Coeff(:,2),rad2deg(alpha))  + 0.001;
+C_D =  interp1(Coeff(:,1),Coeff(:,3),rad2deg(alpha))  + 0.001;
+end
+
 rho = interp1(Atmosphere(:,1),Atmosphere(:,4),r - rEarth);
 
 L = 0.5.*C_L.*rho.*v.^2.*A;
-m = 9000;
+m = 8000;
 D = 0.5.*C_D.*rho.*v.^2.*A;
 
 [rdot,xidot,phidot,gammadot,vdot,zetadot] = RotCoords(r,xi,phi,gamma,v,zeta,L,D,m,alpha,chi);
 
 alphadot = primal.controls(1,:)/scale.a;
-chidot = primal.controls(2,:)/scale.LATLONG;
+chidot = primal.controls(2,:)/scale.ang;
 %=======================================================================
 
-xdot = [rdot*scale.V;xidot*scale.LATLONG;phidot*scale.LATLONG;gammadot*scale.ang;vdot*scale.v;zetadot*scale.ang; alphadot*scale.a; chidot*scale.LATLONG]/scale.t;
+xdot = [rdot*scale.V;xidot*scale.LATLONG;phidot*scale.LATLONG;gammadot*scale.ang;vdot*scale.v;zetadot*scale.ang; alphadot*scale.a; chidot*scale.ang]/scale.t;

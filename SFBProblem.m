@@ -10,7 +10,7 @@ Coeff = dlmread('Coefficients.txt');
 global Atmosphere
 Atmosphere = dlmread('atmosphere.txt');
 
-%-----------------------------------
+%-----------------------------------  
 % Define the problem function files:
 %-----------------------------------
 SFB.cost 		= 'SFBCost';
@@ -21,9 +21,9 @@ SFB.events		= 'SFBEvents';
 % Set up the problem bounds 
 %-------------------------------------------
 global scale
-scale.a = 10;
+scale.a = 100;
 scale.V = 1e-3;
-scale.v = 1e-2;
+scale.v = 1e-3;
 scale.ang = 10;
 scale.LATLONG = 100;
 scale.t = 1;
@@ -33,13 +33,13 @@ tfMax 	    = 800;
 bounds.lower.time 	= [0; 0];				
 bounds.upper.time	= [0; tfMax]*scale.t;			 
 
-bounds.lower.states = [0*scale.V; -1*scale.LATLONG; -1*scale.LATLONG; -1.5707; 1*scale.v; -1*scale.ang; deg2rad(2)*scale.a + eps; -1*scale.ang]; 
-bounds.upper.states = [40000*scale.V; 1*scale.LATLONG; 1*scale.LATLONG; 1.5707; 3000*scale.v; 1*scale.ang; deg2rad(6)*scale.a - eps; 1*scale.ang];
+bounds.lower.states = [0*scale.V; -1*scale.LATLONG; -1*scale.LATLONG; -1.5707; 1*scale.v; -1*scale.ang; deg2rad(2)*scale.a + eps*scale.a; -1*scale.ang]; 
+bounds.upper.states = [40000*scale.V; 1*scale.LATLONG; 1*scale.LATLONG; 1.5707; 3000*scale.v; 1*scale.ang; deg2rad(6)*scale.a - eps*scale.a; 1*scale.ang];
 
-bounds.lower.controls = [-0.1*scale.LATLONG ;deg2rad(-0.1)*scale.a];
-bounds.upper.controls = [0.1*scale.LATLONG ; deg2rad(0.1)*scale.a];
+bounds.lower.controls = [deg2rad(-.5)*scale.a;-0.001*scale.ang];
+bounds.upper.controls = [deg2rad(.5)*scale.a; 0.001*scale.ang ];
 
-bounds.lower.events = [27000*scale.V; 0.01*scale.V; 0*scale.ang; 0*scale.ang; 0*scale.ang; 2850*scale.v; 0*scale.ang; 0.4*scale.ang; 0];	
+bounds.lower.events = [27000*scale.V; 0.01*scale.V; 0*scale.ang; 0*scale.ang; 0*scale.ang; 2850*scale.v; 0*scale.ang; 0];	
 bounds.upper.events = bounds.lower.events;
 
 %------------------------------------
@@ -52,7 +52,7 @@ SFB.bounds = bounds;
 % Select the number of nodes for the spectral algorithm
 %------------------------------------------------------
 
-algorithm.nodes = [60];  
+algorithm.nodes = [100];  
 
 %------------------------------------------------------------------
 % guess.states(1,:) = [10, 0];
